@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         BigInt   @id @default(autoincrement())
+  email      String   @unique
+  name       String
+  password   String
+  created_at DateTime @default(now())
+
+  Video    Video[]
+  Comments Comments[]
+  Likes    Likes[]
+
+  @@index([email, name])
+  @@map("Users")
+}
+
+model Video {
+  id          BigInt  @id @default(autoincrement())
+  title       String
+  description String  @default("")
+  credits     String  @default("")
+  likesCount  BigInt  @default(0) @map("likes_count")
+  videoURL    String  @map("video_url")
+  isPrivate   Boolean @default(false)
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId BigInt? @map("user_id")
+
+  Comments Comments[]
+  Likes    Likes[]
+
+  created_at       DateTime @default(now())
+  publication_date DateTime @default(now())
+
+  @@index([likesCount(sort: Desc), userId(sort: Desc), title(sort: Desc)])
+  @@map("Videos")
+}
+
+model Comments {
+  id         BigInt    @id @default(autoincrement())
+  comment    String
+  created_at DateTime  @default(now())
+  deleted_at DateTime?
+  deleted    Boolean   @default(false)
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId BigInt?
+
+  Video   Video?  @relation(fields: [videoId], references: [id])
+  videoId BigInt?
+
+  @@index([userId(sort: Desc), videoId(sort: Desc), created_at(sort: Desc)])
+}
+
+model Likes {
+  id BigInt @id @default(autoincrement())
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId BigInt?
+
+  Video   Video?  @relation(fields: [videoId], references: [id])
+  videoId BigInt?
+
+  @@index([userId(sort: Desc), videoId(sort: Desc)])
+}
