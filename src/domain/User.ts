@@ -3,11 +3,33 @@ export class User {
     readonly id: bigint,
     readonly email: string,
     readonly name: string,
-    readonly created_at: Date
+    readonly created_at: Date,
+    readonly password: string
   ) {}
+
+  static toPrimitives(user: User) {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      created_at: user.created_at,
+      password: user.password
+    };
+  }
+
+  static toSafePrimitives(user: User) {
+    const returnObj = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      created_at: user.created_at
+    };
+
+    return { ...returnObj };
+  }
 }
 
-export type UserRepo = User & { password: string };
+export type UserCreateDTO = Omit<User, "id" | "created_at">;
+export type UserUpdateDTO = Partial<Pick<User, "name" | "password">>;
 
-export type UserCreateDTO = Omit<UserRepo, "id" | "created_at">;
-export type UserUpdateDTO = Partial<Pick<UserRepo, "name" | "password">>;
+export type UserApi = Omit<User, "password">;
