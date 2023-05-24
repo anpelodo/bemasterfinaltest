@@ -19,7 +19,7 @@ export class User {
 
   static toSafePrimitives(user: User): UserReturn {
     const returnObj = {
-      id: user.id,
+      id: user.id.toString(),
       email: user.email,
       name: user.name,
       created_at: user.created_at
@@ -32,4 +32,4 @@ export class User {
 export type UserCreateDTO = Omit<User, "id" | "created_at">;
 export type UserUpdateDTO = Partial<Pick<User, "name" | "password">>;
 
-export type UserReturn = Omit<User, "password">;
+export type UserReturn = Omit<User, "password" | "id"> & { id: string };
